@@ -1,0 +1,27 @@
+button {
+	width: 200px;
+	height: 100px;
+	background-color: #f79736;
+	border-radius: 20px;
+	box-shadow: 10px 10px 5px grey;
+}
+
+button:hover {
+	background-color: #fff5e6;
+}
+
+#leftPanel {
+	position: fixed;
+	margin-top: 250px;
+	margin-left: 5%;
+}
+	
+#rightPanel {
+	position: fixed;
+	margin-top: 250px;
+	margin-left: 80%;
+}
+
+#midPanel {
+	margin-left: 20%;	
+]

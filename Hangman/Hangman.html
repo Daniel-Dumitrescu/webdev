@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<!--Daniel Dumitrescu April 17, 2019-->
+<!--A random hidden word is generated that the user is to guess.
+ Once eight incorrect guesses have been made the game ends-->
+<html>
+<head>
+<style>
+
+body { 
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: #232120;
+  text-align: left;
+  font-family: "Open Sans";
+}
+
+button {
+    background-color: #000000;
+}
+
+.btn-group button {
+    background-color: :#000000;
+    border: 1px solid green;
+    color: white;
+    padding: 10px 24px;
+    cursor: pointer;
+    float: left;
+}
+
+/* Set size of buttons as % of page */
+.top_button {
+    width: 25vw;
+    height: 8vw;
+    font-size: 4vmin;
+}
+
+.key_button {
+    width: 5vw;
+    height: 5vw;
+    font-size: 2vw;
+    position: relative;
+    top: -700px;     
+}
+
+.btn-group button:not (:last-child ) {
+    border-right: none; /* Prevent double borders */
+}
+
+/* Clear floats */
+.btn-group:after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+/* Add a background color on hover */
+.btn-group button:hover {
+    background-color: #ff1500;
+}
+
+#start, #restart, #exit, #inst, #help {
+    width: 200px;
+}
+
+#picBox {
+    width: 300px;
+    height: 500px;
+    background-color: #000000;
+    position: relative;
+    margin-left: 35vw;
+}
+
+body {
+    background-color: #232120;
+    text-align: left;
+    font-family: "Open Sans";
+}
+
+#lives, button, #dash, #restart, #percentWin, #letPicked, #record, #p1 {
+    text-shadow: 0px -2px 4px #fff, 0px -2px 10px #f6ff5b, 0px -20px 20px
+        #fcb614, 0px -40px 40px #fc1414;
+}
+
+#percentWin, #letPicked, #record, #p1, #lives {
+    color: #fff
+}
+
+#dash {
+    font-size: 96px;
+    position: relative;
+    top: -600px;
+}
+
+#record, #percentWin, #letPicked, #lives {
+    display:inline-block;
+    width:45%;
+    padding:10px
+    position: relative;
+    top: -50px;    
+}
+
+div.sticky {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+}
+}
+</style>
+</head>
+<body>
+
+<div class = "sticky">
+<div class = "btn-group">
+  <button id = "start"  class = "top_button" onClick = "startFunction()">START</button>
+  <button id = "inst"   class = "top_button" onClick = "openRules()">RULES</button>
+  <button id = "help"   class = "top_button" onClick = "openHelp()">HELP</button>
+  <button id = "exit"   class = "top_button" onClick = "window.location.href = 'HangmanSplash.html'">EXIT</button>
+</div>
+
+<p id = "record"> </p>
+<p id = "percentWin"></p>
+<p id = "letPicked">Letters picked: </p>
+<p id = "lives"></p>
+<div id = "picBox"></div>
+<p id = "dash"></p>
+</div>
+
+<script>
+// Open Rules and Help in new tab
+function openRules(){
+    window.open(
+    "HangmanInst.html",
+    "_blank"
+    )  
+}
+
+function openHelp(){
+    window.open(
+    "HangmanHelp.html",
+    "_blank"
+    )  
+}
+
+var wordBank = ["INTERMOLECULAR", "KINETIC", "INTERNAL", "POTENTIAL", 
+                "KINETIC", "ABSOLUTE", "EQUILIBRIUM", "CONSTANT",
+                "SPECIFIC", "CAPACITY", "LATENT", "HEAT", "KELVIN", 
+                "SURROUNDINGS", "ENERGY", "VOLUMELESS", "RANDOM", 
+                "ELASTIC", "MOMENTUM", "BOYLE", "CHARLES", "PRESSURE", 
+                "VOLUME", "MOLES", "AVOGADRO", "BOLTZMANN", "DENSITY", 
+                "POWER", "OUTPUT", "RENEWABLE", "TURBINE", "GRAVITATIONAL", 
+                "ELECTRICAL", "FUEL", "CONTROL", "MODERATOR", "EXCHANGER", 
+                "RADIOACTIVE", "CONDUCTION", "RADIATION", "CONVECTION", 
+                "INTENSITY", "EMISSIVITY", "INTENSITY", "SCATTER", 
+                "RESONANCE", "ABSORB", "EXCHANGES", "METHANE", 
+                "VAPOR", "CARBON", "NITROGEN"];
+                
+var word;
+var hiddenWord  = "";
+var pick;
+
+var images = new Array(8);
+images[0] = new Image()
+images[0].src = "Hangman0.jpg"
+images[1] = new Image()
+images[1].src = "Hangman1b.jpg"
+images[2] = new Image()
+images[2].src = "Hangman2b.jpg"
+images[3] = new Image()
+images[3].src = "Hangman3b.jpg"
+images[4] = new Image()
+images[4].src = "Hangman4b.jpg"
+images[5] = new Image()
+images[5].src = "Hangman5b.jpg"
+images[6] = new Image()
+images[6].src = "Hangman6b.jpg"
+images[7] = new Image()
+images[7].src = "Hangman7b.jpg"
+flame_img = new Image()
+flame_img.src = "flame.gif"
+
+
+var temp = ""
+/* Keep track of number of wins and plays to calculate % Win */
+var wins = 0;
+var plays = 0;
+/* Keep track of number of guesses and incorrect guesses user makes */
+var guess = 0;
+var record = 100;
+var pick = 1;
+var game_completed = false;
+/* Hide record if user hasn't played yet */
+
+if (plays = 0){
+  document.getElementById("record").innerHTML = ""
+}
+document.getElementById("record").innerHTML = "Press START to begin guessing."
+
+
+// Function carried out only during first round of play
+function startFunction() {
+  if (plays >=  1) {
+    restart()
+    return;
+  }
+//Replace START with RESTART once game is started
+  document.getElementById("start").innerHTML = "RESTART"
+
+//Generate random word
+  word = wordBank[Math.floor(Math.random()*wordBank.length)]
+  pick  = 1
+  plays = 1
+  
+//Add a dash for each letter in the hidden word
+  for (i= 0; i< word.length; i++) {
+	 hiddenWord = hiddenWord + "-"
+  }
+//Show dashes on page
+  document.getElementById("dash").innerHTML = hiddenWord
+
+
+//set starting background for picBox
+  document.getElementById("picBox").appendChild(images[0])
+  document.getElementById("picBox").childNodes[0].style.height = "500px";
+  document.getElementById("picBox").childNodes[0].style.width = "300px";
+
+
+  //this creates 6 buttons, you will need 26
+  for(x= 1;x<= 26;x++){
+    //use the createElement function to create known HTML elements
+    var btn = document.createElement("BUTTON");
+    var myP = document.createElement("br");
+  
+    //why start at 64? Because the letter 'A' is code 65
+    var letter = String.fromCharCode(x+64);
+    var t = document.createTextNode(letter);
+    //add the text stored in 't' to the our button variable
+    btn.appendChild(t);
+    //give the btn an id to make it easy to access later
+    btn.id = letter;
+    //this is how to add an event to the button -- name the event and
+    //then include the function you want it to perform
+    btn.addEventListener("click", checkLetter);
+    btn.addEventListener("mouseover", changeColor);
+    btn.addEventListener("mouseout", changeColor2);
+    btn.className = "key_button"; 
+    //add the btn to the page
+    document.body.appendChild(btn);
+    //add a line break 'myP' after 6 buttons
+    if (x%6 == 0) {
+      document.body.appendChild(myP);
+    }
+  }
+  document.getElementById("start").value = "RESTART"
+  document.getElementById("record").style.visibility = "hidden"
+}
+
+/* Function carried out when new game started */
+function restart(){
+   game_completed = false;
+   guess = 0;	
+   /* Number of plays increases to keep track of % Win */  
+   plays = plays + 1;
+   /* Enable any button that has been disabled */
+   for(x= 1;x<= 26;x++){
+        var letter = String.fromCharCode(x+64);
+        document.getElementById(letter).disabled = false
+   }
+   /* Reset hidden word and choose a new word */
+
+   hiddenWord = ""
+   word = wordBank[Math.floor(Math.random()*wordBank.length)]
+  
+   /* Create new dashed word */
+   for (i= 0; i<word.length; i++){
+        hiddenWord = hiddenWord + "-"
+   }
+  
+   pick = 1
+   /* Reset number of lives, hangman drawings, and letters picked */
+   document.getElementById("lives").innerHTML = ""
+   var item = document.getElementById("picBox")
+   item.replaceChild(images[0], item.childNodes[0]);
+   document.getElementById("picBox").childNodes[0].style.height = "500px";
+   document.getElementById("picBox").childNodes[0].style.width = "300px";
+   document.getElementById("dash").innerHTML = hiddenWord
+   document.getElementById("letPicked").innerHTML = "Letters picked: "
+   /* Show % Win */
+   document.getElementById("percentWin").innerHTML = Math.round((wins/plays)*100) + "% of games won"
+   /* Replace PLAY AGAIN button with RESTART */
+   document.getElementById("start").innerHTML = "RESTART"
+}
+
+/* Function played out when letter clicked only until game is finished*/
+function checkLetter(){
+	if (game_completed) {
+		return;
+	}
+    // Keep track of number of guesses
+    guess = guess + 1
+    //this refers to the object that called this function
+    //disable letter once it has been selected and add it to letters picked
+    this.disabled = true;
+    document.getElementById("letPicked").innerHTML +=  this.id;
+  
+    temp = ""
+    // If the letter selected matches the letter in the word in that position, that letter is shown, otherwise a dash from hiddenWord is shown  
+    for(i= 0; i<word.length; i++){
+        if ((this.id == word.charAt(i))){
+            temp += word.charAt(i)
+        }else{
+            temp += hiddenWord.charAt(i)
+          
+        }
+    }
+    // If no letters have been revealed, another part of the body is shown as hanged and the number of lives decreases
+    if ((hiddenWord == temp) && (pick <=  7)){
+    var item = document.getElementById("picBox")
+        item.replaceChild(images[pick], item.childNodes[0]);
+        item.childNodes[0].style.height = "500px";
+        item.style.width = "300px";      
+        pick = pick + 1;
+        document.getElementById("lives").innerHTML = ((8 - pick) + " lives left") ;
+        document.body.style.backgroundImage = "url('fire-particle.jpg')";
+        document.body.style.backgroundRepeat = "no-repeat";
+        document.body.style.backgroundSize = "cover";
+    // If more than 7 tries have been made, the game ends, a flame is shown, and % Win is shown
+    } else if (pick > 7){
+        alert("You've been hanged!")
+        alert("The word was " + word)
+         var item = document.getElementById("picBox")
+        item.replaceChild(flame_img, item.childNodes[0]);
+        item.childNodes[0].style.height = "500px";
+        item.style.width = "300px";
+        document.getElementById("start").innerHTML = "PLAY AGAIN"
+    }
+    // The word with guessed letters revealed is shown  
+    hiddenWord = temp
+    temp = ""
+    document.getElementById("dash").innerHTML = hiddenWord
+    // If the user has guessed the word, the number of guesses taken, and the record is shown and the game ends    
+    if (hiddenWord == word) {
+    	game_completed = true;
+        alert("You've uncovered the hidden word!")
+        alert("It took you " + guess + " guesses")
+        wins = wins + 1
+        if ((pick-1) < record){
+            record = (pick-1)
+            document.getElementById("record").innerHTML = ("Your record is " + record + " incorrect guesses")
+            document.getElementById("record").style.visibility = "visible"
+        }
+        document.getElementById("start").innerHTML = "PLAY AGAIN"
+      }
+      document.getElementById("percentWin").innerHTML = Math.round((wins/plays)*100) + "% of games won"
+}
+  
+// Change colour of buttons when hovering
+function changeColor(){
+    this.style.backgroundImage= "url('flame1.jpeg')";
+  
+}
+// Change colour of buttons after leaving button
+function changeColor2(){
+    this.style.backgroundImage= "url('red-flame-1.jpg')"
+}
+
+</script>
+</body>
+</html>

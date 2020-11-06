@@ -1,0 +1,70 @@
+<html>
+<!--Daniel Dumitrescu April 17, 2019-->
+<head>
+	<title>Help</title>
+</head>
+<style>
+body{
+ background-color:#232120;
+ text-align:left;
+ font-family: "Open Sans";
+ color: #f5f5f5;
+ font-size:20px;
+}
+
+button{   
+ width:200px;
+ height:100px;
+ background-color:#000000;
+ font-size:36px;
+ text-shadow:
+ 0px -2px 4px #fff,
+ 0px -2px 10px #f6ff5b,
+ 0px -20px 20px #fcb614,
+ 0px -40px 40px #fc1414;
+}
+
+.btn-group button {
+  background-color: :#000000; /*#ff1500; Green background */
+  border: 1px solid green; /* Green border */
+  color: white; /* White text */
+  padding: 10px 24px; /* Some padding */
+  cursor: pointer; /* Pointer/hand icon */
+  float: left; /* Float the buttons side by side */
+}
+
+.btn-group button:not(:last-child) {
+  border-right: none; /* Prevent double borders */
+}
+
+/* Clear floats (clearfix hack) */
+.btn-group:after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* Add a background color on hover */
+.btn-group button:hover {
+  background-color: #ff1500;
+}
+</style>
+<body>
+<div class="sticky"> 
+<div class="btn-group">
+<button id="exit" onClick="window.location.href = 'Hangman.html'">EXIT</button>
+<button id="inst" onClick="window.location.href = 'HangmanInst.html'">RULES</button>
+</div>
+</div>
+
+
+<p>Click on a letter to see if that letter appears in the word. If it does, all 
+occurrences of that letter are revealed, and that letter cannot be selected again.</p>
+<p>Click RESTART to generate a new hidden word and enable all letters again. 
+The letters used will be reset, but your record and % Win will be saved.</p>
+<p>Click EXIT to leave the game. Your record and % Win will not be saved.</p>
+
+
+
+</body>
+</html>

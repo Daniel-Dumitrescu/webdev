@@ -1,0 +1,143 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="CSS/navbar.css">
+<link rel="stylesheet" type="text/css" href="CSS/leftPanel.css"> 
+<link rel="stylesheet" type="text/css" href="CSS/topPages.css">
+<script type="text/javascript" src="Scripts/leftPanel.js"></script>
+<style>
+#midPanel {
+	margin-left: 100%;
+}
+</style>
+<title>The Accounting Cycle</title>
+</head>
+<body>
+<a name="top"></a>
+<div class="topnav">
+<ul id="ulNavbar"> 
+  <li id="liNavbar"><a href="index.html">Home</a></li>	
+  <li id="liNavbar"><a href="calendar.html">Calendar</a></li>
+  <li id="liNavbar"class="dropdown">
+	<a href="javascript:void(0)"class="dropbtn">Club Files</a>
+		<div class="dropdown-content">
+	 <a href="lessons.html">Lessons</a>
+    <a href="exercises.html">Practice Exercises</a>
+    <a href="tutorials.html">Video Tutorials</a>
+    <a href="accountingCycle.html">The Accounting Cycle</a>
+		</div>
+ </li>
+ <li id="liNavbar" class="dropdown">
+	<a href="javascript:void(0)"class="dropbtn">Accounting & Finance Game Info</a>
+		<div class="dropdown-content">
+    <a href="description.html">Description</a>
+    <a href="scores.html">Live Scores</a>
+    <a href="play.html">Join the Game!</a>
+		</div>
+ </li>
+ <li id="liNavbar" class="dropdown">
+	<a href="javascript:void(0)"class="dropbtn">About the Club</a>
+		<div class="dropdown-content">
+    <a href="aboutClub.html">About Accounting & Finance Club</a>
+    <a href="contact.html">Contact Information</a>
+	<a href="join.html">Join the Club!</a>
+		</div>
+ </li>
+ <li id="liNavbar" class="dropdown">
+	<a href="javascript:void(0)"class="dropbtn">CPA</a>
+		<div class="dropdown-content">
+  	<a href="aboutCPA.html">About the CPA</a>
+    <a href="events.html">CPA Events</a>
+   
+		</div>
+ </li>
+ <li id="liNavbar">
+	<img src="Assets/AFlogo.png">
+</li>
+</div>
+
+<div style="width: 100%">
+ <div id="leftPanel" style="float: left; width: 20%; z-index: 9999">
+	<div class="vertical-center">
+		<button type="button" onclick="openLessons()">Lessons</button><br><br>
+		<button type="button" onclick="openExercises()">Exercises</button><br><br>
+		<button type="button" onclick="openVideos()">Video Tutorials</button><br><br></div>
+	</div>
+<div id="pageStart">
+<center><div id="midPanel" style="float: left; width: 60%">
+		<div>
+			<h1>The Accounting Cycle</h1>
+			<h6>The elements of 'The Accounting Cycle' are presented below. Each element will be covered in more detail at club meetings throughout the year.</h6>
+			<h3 id="elementText"> </h3>
+			<div class="elementPic" id="elementPic"> </div>
+			<button id="cycleButton" type="button" onclick="nextElement()">Next</button>
+		</div>
+	</div>
+</div>  
+ <div id="rightPanel" style="float: right; width: 20%;">
+	<p>The next Accounting & Finance Club meeting will take place on Monday, January 13th</p><hr>
+	<p>Form for next round of Accounting & Finance Game is due by Friday, January 17th</p><hr>
+	<p>Yearbook photos will take place on Thursday, January 23rd</p></div>
+ </div>
+</div>         
+<br><br><br><br><br>
+</body>
+<script>
+	var x = 0
+	
+	
+	var elementPics = new Array(8);
+	elementPics[0] = new Image()
+	elementPics[0].src = "Assets/cycle1.png"
+	elementPics[1] = new Image()
+	elementPics[1].src = "Assets/cycle2.jpg"
+	elementPics[2] = new Image()
+	elementPics[2].src = "Assets/cycle3.png"
+	elementPics[3] = new Image()
+	elementPics[3].src = "Assets/cycle4.png"
+	elementPics[4] = new Image()
+	elementPics[4].src = "Assets/cycle5.png"
+	elementPics[5] = new Image()
+	elementPics[5].src = "Assets/cycle6.png"
+	elementPics[6] = new Image()
+	elementPics[6].src = "Assets/cycle7.jpg"
+	elementPics[7] = new Image()
+	elementPics[7].src = "Assets/cycle8.svg"
+	
+for (i=0; i<elementPics.length; i++) {
+	elementPics[i].style.width = '500px'
+	elementPics[i].style.height = '300px'
+} 
+	
+	var elementText = new Array(8);
+	elementText[0] = "Transaction occurs"
+	elementText[1] = "Record journal entry"
+	elementText[2] = "Post to ledger"
+	elementText[3] = "Complete Trial Balance"
+	elementText[4] = "Complete Worksheet"
+	elementText[5] = "Complete Adjusting Entries"
+	elementText[6] = "Complete Financial Statements"
+	elementText[7] = "Close the Books"
+	
+	document.getElementById("elementText").innerHTML = elementText[x];
+var item = document.getElementById("elementPic");
+	item.appendChild(elementPics[0]);
+	
+function nextElement(){
+	x = x + 1
+	if (x == 8) {
+		item.removeChild(elementPics[7])
+		item.appendChild(elementPics[0])
+		x = 0;
+		document.getElementById("elementText").innerHTML = elementText[x];
+		return;
+		}
+	item.replaceChild(elementPics[x], elementPics[x-1])
+	document.getElementById("elementText").innerHTML = elementText[x]
+	
+}
+</script>
+<footer>
+Accounting & Finance Club 2019-2020 
+<a id="backToTop" href="#top">Back to Top</a>
+</footer>

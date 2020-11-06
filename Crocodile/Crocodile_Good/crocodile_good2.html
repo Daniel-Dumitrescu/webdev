@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<!--Daniel Dumitrescu-->
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Crocodile</title>
+    <style>
+ { padding: 0;
+  margin: 0; 
+ }
+ 
+ canvas {
+  	background: #eee;
+   	display: block; 
+	margin: 0 auto; 
+}
+
+button {
+    width: 300px;
+    height: 50px;
+    font-size: 24px;
+	display: inline-block;
+	background-color: #ffd1f9;
+}
+
+body {
+	background-image: url("clouds.jpg");
+}
+
+p {
+	color: #ff02bb;
+	font-size: 24px;
+}
+
+.scores {
+	float:left;
+	padding:5px;
+}
+    </style>
+</head>
+
+<body>
+<!--Add score and player images to same class to place them inline-->
+<div class="scores" id="cScore">0</div> 
+<div class="scores">
+	<img src="unicorn.jpg" width="50" height="50">
+</div>
+<div class="scores" id="pScore">0</div> 
+<div class="scores">
+	<img src="pirate.png" width="50" height="50">
+</div>
+<center><button id = "resume"  onClick = "resumeGame()">RETURN TO GAME</button>
+<button id = "playAgain"  onClick = "playGameAgain()">RESTART</button></center>
+<canvas id="myCanvas" width="750" height="750"></canvas>
+<center><p id = "message"></p></center>
+
+<script>
+var canvas = document.getElementById("myCanvas");
+var ctx = canvas.getContext("2d");
+var birdRadius = 10;
+var timesRun = 0;
+var birdX 
+var birdY 
+var crateX
+var crateY
+var score = [0, 0]
+//Keycodes for directions of both characters
+//Arrow keys for croc, WASD for pirate
+var leftKey = [37, 65]
+var rightKey = [39, 68]
+var upKey = [38, 87]
+var downKey = [40, 83]
+var keyPressed 
+var interv
+var gameStarted = [false, false]
+var collision = false
+var bird = new Image();
+	bird.src = "bird.png"
+var crocHead = new Image();
+	crocHead.src = "croc_head.jpg"
+var crocBody = new Image();
+	crocBody.src = "croc_body.jpg"
+var background = new Image();
+	background.src = "rainbow.png"
+var crate = new Image();
+	crate.src = "crate.png" 
+var mask = new Image();
+	mask.src = "mask.jpg"
+var pickAxe = new Image();
+	pickAxe.src = "pick-axe.jpg"
+var home = new Image();
+	home.src = "unicorn_home.png"
+var animals = new Image();
+	animals.src = "animals.png"
+var crocTrap = new Image();
+	crocTrap.src = "croc_trap.jpg"
+var pirateTrap = new Image();
+	pirateTrap.src = "pirate_trap.png"
+var characterHead
+var level = 1;
+var croc = new Array();
+var pirate = new Array();
+var characters = new Array();
+var charNames = ["Crocodile", "Pirate"]
+var charX = [0, 0]
+var charY = [0, 0] 
+//To keep track of the direction that both characters are going in
+var goingUp = [false, false]
+var goingDown = [false, false]
+var goingRight = [false, false]
+var goingLeft = [false, false]
+var birdsByCroc = 0
+//Keep "Return to Game" button hidden when game is in play
+var resume = document.getElementById("resume");
+	resume.style.display = "none"
+//Show "Play Again" button
+var playAgain = document.getElementById("playAgain");
+	playAgain.style.display = "inline-block"
+
+//The starting coordinates of all the obstacles in the game
+var rectangles1 = [ 
+	{x: 150, y: 100},
+	{x: 150, y: 100},
+	{x: 50,  y: 200},			
+	{x: 50,  y: 200},
+	{x: 50,  y: 450},
+	{x: 125, y: 450},
+	{x: 125, y: 600},
+	{x: 525, y: 400},
+	{x: 525, y: 400},
+	{x: 675, y: 100},
+	{x: 200, y: 150},
+	{x: 200, y: 150},
+	{x: 200, y: 550},
+	{x: 450, y: 300},
+	{x: 450, y: 300},
+	{x: 600, y: 100},
+]
+//The corresponding lengths and widths for the obstacles
+var rectangleSizes1 = [
+	{x: 200, y: 5},
+	{x: 5, y: 100},
+	{x: 100, y: 5},
+	{x: 5, y: 250},
+	{x: 75, y: 5},
+	{x: 5, y: 150},
+	{x: 400, y: 5},
+	{x: 5, y: 200},
+	{x: 150, y: 5},
+	{x: 5, y: 300},
+	{x: 200, y: 5},
+	{x: 5, y: 400},
+	{x: 250, y: 5},
+	{x: 5, y: 250},
+	{x: 150, y: 5},
+	{x: 5, y: 200},
+]
+//Obstacles for level 2
+var rectangles2 = [ 
+	{x: 150, y: 100},
+	{x: 150, y: 100},
+	{x: 550, y: 50},
+	{x: 600, y: 50},
+	{x: 550, y: 50},
+	{x: 600, y: 100},
+	{x: 150, y: 600},
+	{x: 650, y: 400},
+	{x: 650, y: 150},
+	{x: 400, y: 125},
+	{x: 175, y: 200},
+	{x: 175, y: 400},
+	{x: 175, y: 600},
+	{x: 650, y: 400},
+	{x: 650, y: 350},
+	{x: 700, y: 350}
+]
+
+var rectangleSizes2 = [
+	{x: 400, y: 5},
+	{x: 5, y: 500},
+	{x: 5, y: 50},
+	{x: 5, y: 50},
+	{x: 50, y: 5},
+	{x: 100, y: 5},
+	{x: 500, y: 5},
+	{x: 5, y: 200},
+	{x: 5, y: 200},
+	{x: 5, y: 450},
+	{x: 450, y: 5},
+	{x: 450, y: 5},
+	{x: 450, y: 5},
+	{x: 50, y: 5},
+	{x: 50, y: 5},
+	{x: 5, y: 50},
+]
+//Obstacles for level 3
+var rectangles3 = [ 
+	{x: 250, y: 100},
+	{x: 250, y: 250},
+	{x: 400,  y: 150},			
+	{x: 400,  y: 150},
+	{x: 600,  y: 150},
+	{x: 200, y: 550},
+	{x: 100, y: 100},
+	{x: 525, y: 600},
+	{x: 100, y: 100},
+	{x: 100, y: 250},
+	{x: 175, y: 250},
+	{x: 100, y: 450},
+	{x: 100, y: 275},
+	{x: 200, y: 100}
+
+]
+
+var rectangleSizes3 = [
+	{x: 5, y: 150},
+	{x: 150, y: 5},
+	{x: 5, y: 100},
+	{x: 200, y: 5},
+	{x: 5, y: 400},
+	{x: 400, y: 5},
+	{x: 100, y: 5},
+	{x: 5, y: 200},
+	{x: 5, y: 150},
+	{x: 75, y: 5},
+	{x: 5, y: 200},
+	{x: 75, y: 5},
+	{x: 5, y: 175},
+	{x: 5, y: 450}
+
+]
+//Keep all the obstacles of each level in an array to switch obstacles when the level changes
+var walls = [rectangles1, rectangles2, rectangles3]
+var wallSizes = [rectangleSizes1, rectangleSizes2, rectangleSizes3]
+
+//The coordinates of the "Surprise X" for each level
+var x1 = [400, 100, 425, 125]
+var x2 = [300, 300, 325, 325]
+var x3 = [125, 275, 150, 300]
+var x = [x1, x2, x3]
+
+//Create each rectangle from the rectangles array
+function drawWalls(){    
+	for(i=0; i<walls[level-1].length; i++){
+		ctx.rect(walls[level-1][i].x, walls[level-1][i].y, 
+		wallSizes[level-1][i].x, wallSizes[level-1][i].y)
+		ctx.stroke();
+	}
+}
+
+//Starting position of the characters
+function resetCharacters(){
+	croc =  [ {x: 50, y: 0},
+			  {x: 40, y: 0},
+			  {x: 30, y: 0},
+              {x: 20, y: 0},
+              {x: 10, y: 0},
+		    ]
+	pirate = [ {x: 700, y: 650},
+			  {x: 710, y: 650},
+			  {x: 720, y: 650},
+              {x: 730, y: 650},
+              {x: 740, y: 650},
+		    ]	
+    characters = [croc, pirate]
+	//No displacement in the X or Y direction on start
+	charX = [0, 0]
+	charY = [0, 0] 
+}
+
+//Add the characters to the canvas
+function drawCharacters(){
+  for(i=0; i<characters.length; i++){
+    // loop through the characters Squares drawing each Square on the canvas
+    for(j=0; j<characters[i].length; j++){
+		// Set the colour of the croc Square
+       if(i==0){
+	   		// Set the colour of the croc Squares
+	   		ctx.fillStyle = 'lightgreen';
+        	// Set the border colour of the croc Squares
+        	ctx.strokestyle = 'darkgreen';
+	   }else if(i==1){
+	   	// Set the border and colour of the pirate Squares
+	   		ctx.fillStyle = 'black';
+			ctx.strokestyle = 'black';
+	   }
+	 
+	 for(k=0; k<characters[0].length; k++) {
+      ctx.drawImage(crocBody, characters[0][k].x, characters[0][k].y, 10, 10);
+	}
+        // Draw a rectangle to represent the croc Square at the coordinates
+        // that the Square is located at
+        ctx.fillRect(characters[i][j].x, characters[i][j].y, 10, 10);
+        // Draw a border around the character Square
+        ctx.strokeRect(characters[i][j].x, characters[i][j].y, 10, 10);
+    }
+	//Add the images to the location of the character squares
+	ctx.drawImage(crocHead, croc[0].x, croc[0].y, 10, 10);
+	ctx.drawImage(mask, pirate[0].x, pirate[0].y, 10, 10);
+	ctx.drawImage(pickAxe, pirate[pirate.length-1].x, pirate[pirate.length-1].y, 10, 10);
+  }
+
+  //  Select the colour to fill the canvas
+  ctx.fillStyle = "white";
+  //  Select the colour for the border of the canvas
+  ctx.strokestyle = "black";
+  // Draw a "border" around the entire canvas
+  ctx.strokeRect(0, 0, canvas.width, canvas.height);
+}
+
+//Add the bird to the canavs
+function drawBird() {
+	ctx.beginPath();
+    ctx.arc(birdX, birdY, 10, 0, Math.PI*2);
+    ctx.fillStyle = "#0095DD";
+    ctx.fill();
+    ctx.closePath();
+	ctx.drawImage(bird, (birdX-10), (birdY-10), 20, 20);
+}
+
+//Randomly create the x and y coordinates for the bird
+function createBird() {
+    birdX = Math.floor(Math.random()*canvas.width);
+    birdY = Math.floor(Math.random()*canvas.height);
+    drawBird();
+}
+
+//Add the crate to the canavs
+function drawCrate() {
+	ctx.fillRect(crateX, crateY, 20, 20);
+    ctx.strokeRect(crateX, crateY, 20, 20);
+	ctx.drawImage(crate, crateX, crateY, 20, 20);
+}
+
+//Randomly create the x and y coordinates for the crate
+function createCrate(){
+	crateX = Math.floor(Math.random()*canvas.width);
+	crateY = Math.floor(Math.random()*canvas.height);
+	drawCrate();
+}
+
+//If the bird is created at the coordinates where one of the character is, create a new location
+function birdOnChar() {
+	for(i=0; i<characters.length; i++){ 
+		for(j=0; j<characters[i].length; j++) {
+			if (((characters[i][j].x == birdX) && (characters[i][j].y == birdY)) == false) {
+				createBird();
+			}
+		}
+    }
+}
+
+//Add the "Surprise X" to the canvas
+function drawX(){
+	ctx.beginPath();
+	ctx.moveTo(x[level-1][0], x[level-1][1]);
+	ctx.lineTo(x[level-1][2], x[level-1][3]);
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.moveTo(x[level-1][0], x[level-1][3]);
+	ctx.lineTo(x[level-1][2], x[level-1][1]);
+	ctx.stroke();
+	
+}
+
+//Functions to be carried out the first time the game is loaded
+function start() {
+	alert("Catch the enemy and eat as many birdies as you can!")
+    resetCharacters(); 
+	drawCharacters();
+	createBird();
+	drawWalls();
+	drawX();
+	createCrate();
+}
+
+//Functions to be carried out after the death of a character
+function restart() {
+	//Reser directions and add the elements back to the canvas
+    gameStarted[0] = false;
+	gameStarted[1] = false;
+	goingUp = [false, false];
+	goingDown = [false, false];
+	goingRight = [false, false];
+	goingLeft = [false, false];
+    clearInterval(interv);
+    resetCharacters(); 
+	drawCharacters();
+	createBird();
+	drawWalls();
+	drawX();
+	createCrate();
+	interv = setInterval(step, 100)
+}	
+
+//Call start function when window loads
+window.onload = start;
+
+function moveCharacters(){
+   for(i=0; i<characters.length; i++){ 
+   //Have characters move by extending the array by 1 at its beginning and shifting the head in that spot
+   //From https://codepen.io/Striker/pen/rVYyvW
+    characterHead = {x: characters[i][0].x + charX[i], y: characters[i][0].y + charY[i]}
+    characters[i].unshift(characterHead);
+    if((Math.abs(characters[i][0].x - birdX) < 10) && (Math.abs(characters[i][0].y - birdY) < 10) )
+	//(gameStarted[0] == true) && (gameStarted[1] == true) 
+	{
+       //If the character is on the bird have it extend its length by 1, earn points, and create a new bird
+		createBird();
+        score[i] += 100;
+		document.getElementById('message').innerHTML = ""
+		if(i==0){
+			//Add score to screen
+			document.getElementById('cScore').innerHTML = score[i]
+			//Keep track of number of birds eaten by crocodile
+			birdsByCroc += 1
+		}else if(i==1){
+			document.getElementById('pScore').innerHTML = score[i]
+		}    
+    } else {
+	// If doesn't eat bird, remove the last element from the array to maintain original length
+        characters[i].pop();
+    }
+  }
+
+}
+
+//Reset canvas
+function  clearCanvas() {
+	ctx.fillStyle = "white";
+	ctx.strokeStyle = "black"; 
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.strokeRect(0, 0, canvas.width, canvas.height);
+}
+function changeDirection(event) {
+//Determine direction from keycode
+	keyPressed = event.keyCode
+  for(i=0; i<characters.length; i++)	{
+  //If any key is pressed, the game starts
+	if ((keyPressed == leftKey[i]) || (keyPressed == rightKey[i]) ||
+	    (keyPressed == upKey[i]) || (keyPressed == downKey[i])) {
+		   gameStarted[i] = true;
+	}
+	
+	if (keyPressed == leftKey[i]) {
+		if (goingRight[i] == true) {
+		//Prevent backtracking 
+			return;
+        } else {
+		//Increase corresponding X or Y coordinates
+			charX[i] = -10;
+			charY[i] = 0;
+        } 
+	}
+	if (keyPressed == rightKey[i]) {
+		if (goingLeft[i] == true) {
+			return;
+		} else {
+			charX[i] = 10;
+			charY[i] = 0;          
+        }
+	}
+	if (keyPressed == upKey[i]) {
+		if (goingDown[i] == true) {
+			return;
+		} else {
+			charX[i] = 0;
+		    charY[i]  = -10;
+		}
+	}
+	if (keyPressed == downKey[i]) {
+		if (goingUp[i] == true) {
+			return;
+		} else {
+			charX[i] = 0;
+			charY[i] = 10;
+		}
+	}
+  }		
+
+}
+
+function step(){
+//Add elements to canvas every 100ms
+  clearCanvas();
+  ctx.drawImage(background, 0, 0, 750, 750);
+  drawWalls();
+  drawBird();
+  moveCharacters();
+  drawCharacters();
+  drawX();
+  drawCrate();
+
+//Do not run until a player has started
+if ((gameStarted[0] === false) && (gameStarted[1] === false)) {  
+  return;
+}
+
+//Update direction that character is travelling to prevent backtracking
+for (i = 0; i < characters.length; i++){
+  if (charY[i] == -10) {
+    goingUp[i] = true
+	goingDown[i] = false
+	goingLeft[i] = false
+	goingRight[i] = false 
+  } else if (charY[i] == 10) {
+    goingDown[i] = true
+	goingUp[i] = false
+	goingLeft[i] = false
+	goingRight[i] = false
+  } else if (charX[i] == 10) { 
+    goingRight[i] = true 
+	goingUp[i] = false
+	goingDown[i] = false
+	goingLeft[i] = false
+  } else if (charX[i] == -10) { 
+    goingLeft[i] = true
+	goingUp[i] = false
+	goingDown[i] = false
+    goingRight[i] = false
+  }
+}
+
+//Check if character runs off screen
+  for (i = 0; i < characters.length; i++){
+       if ((characters[i][0].x < 0) || (characters[i][0].x > canvas.width - 10) || 
+             (characters[i][0].y < 0) || (characters[i][0].y > canvas.height - 10)) {
+			   score[i] -= 1000
+			   document.getElementById('cScore').innerHTML = score[0]
+			   document.getElementById('pScore').innerHTML = score[1]
+			   restart();
+			   return;
+       }
+	
+//Check if character runs into itself   
+		for (j = 4; j < characters[i].length; j++) {
+          if ((characters[i][j].x == characters[i][0].x) && (characters[i][j].y == characters[i][0].y)){
+			 if ((gameStarted[0] == true) && (gameStarted[1] == true)) {
+			   score[i] -= 1000
+			   document.getElementById('cScore').innerHTML = score[0]
+			   document.getElementById('pScore').innerHTML = score[1] 
+			   restart();
+			   return;
+			 }
+			} 
+		}
+		
+//Check if character runs into walls		
+		for (k = 0; k < walls[level-1].length; k++) {
+		  if (((characters[i][0].x >= walls[level-1][k].x) && (characters[i][0].x <= (walls[level-1][k].x + wallSizes[level-1][k].x)) && (characters[i][0].y >= walls[level-1][k].y) && (characters[i][0].y <= (walls[level-1][k].y + wallSizes[level-1][k].y))))
+		  {
+			   score[i] -= 1000
+			   document.getElementById('cScore').innerHTML = score[0]
+			   document.getElementById('pScore').innerHTML = score[1]
+			   clearCanvas();
+			   restart();
+			   return;
+		 }
+		}
+
+  }
+  
+//Check if croc runs into pirate
+  for (i = 0; i < characters[0].length; i++){
+  	 if ((characters[0][i].x == characters[1][0].x) && (characters[0][i].y == characters[1][0].y)){
+	 	if ((gameStarted[0] == true) && (gameStarted[1] == true)) {
+			   score[0] += 1000
+			   document.getElementById('cScore').innerHTML = score[0]
+			   restart();
+			   return;
+			}
+	//Check if croc runs into crate and display message and update score
+	 }else if ((Math.abs(characters[0][0].x - crateX) < 10) 
+	 && (Math.abs(characters[0][0].y - crateY) < 10)){
+	 	document.getElementById('message').innerHTML = "NOOOOOOOooooooooooooooooo"
+		ctx.drawImage(crocTrap, 0, 0, canvas.width, canvas.height);
+		score[0] -= 2000
+		document.getElementById('cScore').innerHTML = score[0]
+		clearInterval(interv);
+		resume.style.display = "block"
+	 }
+   }
+    
+//Check if pirate runs into croc
+   for (i = 0; i < characters[1].length; i++){
+  	 if ((characters[1][i].x == characters[0][0].x) && (characters[1][i].y == characters[0][0].y)){
+	 	if ((gameStarted[0] == true) && (gameStarted[1] == true)) {
+			   score[1] += 1000
+			   document.getElementById('pScore').innerHTML = score[1]
+			   restart();
+			   return;
+	//Check if pirate runs into crate and display message and update score
+	 } else if ((Math.abs(characters[1][0].x - crateX) < 10) 
+	 && (Math.abs(characters[1][0].y - crateY) < 10)){
+	 		ctx.drawImage(pirateTrap, 0, 0, canvas.width, canvas.height);
+			score[1] -= 2000
+			document.getElementById('pScore').innerHTML = score[1]
+			clearInterval(interv);
+			resume.style.display = "block"
+	 }
+	}
+  }
+  
+ //Check if croc runs into "Surprise X"
+  if ((characters[0][0].x > x[level-1][0]) && (characters[0][0].x < x[level-1][2]) && 
+   (characters[0][0].y > x[level-1][1]) && (characters[0][0].y < x[level-1][3])){
+		ctx.drawImage(animals, 0, 0, canvas.width, canvas.height);
+		document.getElementById('message').innerHTML = "Surprise! Happy Birthday!"
+		clearInterval(interv);
+		resume.style.display = "block"
+		
+   }
+   
+  //Move on to next level when a character reaches 10000 points
+   for (i = 0; i < characters.length; i++){
+   	 if (score[i] === 10000){
+	 	level += 1;
+	 	if (level === 4){
+		//End game after all three levels completed
+			if (score[0] === 10000){
+				alert("Crocodile, you've won all the points")
+			}else if (score[1] === 1000){
+				alert("Pirate, you've caught all the crocodiles, Muaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+			}
+			playAgain.style.display = "block"
+			clearInterval(interv);
+			return;	
+		}
+	 	score[0] = 0
+		score[1] = 0
+		document.getElementById('cScore').innerHTML = score[0]
+		document.getElementById('pScore').innerHTML = score[1]
+	 	alert(charNames[i] + " has reached level " + (level))
+		restart();
+		return;
+	 }
+	}
+
+//Show message when croc is approaching bird
+	if ((Math.abs(croc[0].x - birdX) < 50) && 
+	(Math.abs(croc[0].y - birdY) < 50)){
+		document.getElementById('message').innerHTML = "??? Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa Almost Catching the Birdie, Crocodile!"
+	} else if (((Math.abs(characters[1][0].x - birdX) < 10) && (Math.abs(characters[1][0].y - birdY) < 10))) {
+		document.getElementById('message').innerHTML = "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa The Pirate Caught the Birdie!"
+	} else {
+		document.getElementById('message').innerHTML = ""
+	}
+
+//Show message if croc catches 100 birds
+	if (birdsByCroc == 100){ 
+		document.getElementById('message').innerHTML = "Crocodile, you have reached your home, where you are safe from the pirate"
+		ctx.drawImage(home, 0, 0, canvas.width, canvas.height);
+		clearInterval(interv)
+		birdsByCroc = 0;
+		resume.style.display = "block"
+		return;
+	}
+}
+
+//Continue game when button pressed
+function resumeGame(){
+	interv = setInterval(step, 100)
+}
+
+//Reset game completely when button pressed
+function playGameAgain(){
+    level = 1;
+    birdsByCroc = 0;
+	score = [0, 0];
+	document.getElementById('cScore').innerHTML = score[0]
+	document.getElementById('pScore').innerHTML = score[1]
+	restart();
+}
+
+interv = setInterval(step, 100)
+document.addEventListener("keydown", changeDirection)
+
+</script>
+</body>
+</html>
