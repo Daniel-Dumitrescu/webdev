@@ -1,6 +1,6 @@
 # webdev
 
-This GitHub consists of a sample of my web development projects, coded using HTML, CSS, and JavaScript
+This GitHub repository consists of a sample of my web development projects, coded using HTML, CSS, and JavaScript
 
 The Accounting and Finance Club website was created for the Accounting & Finance club at Colonel By Secondary School. 
 
