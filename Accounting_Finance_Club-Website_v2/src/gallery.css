@@ -1,0 +1,27 @@
+.gallery {
+  background-color: rgb(24, 31, 31);
+  width: 100vw;
+  height: 70vh;
+}
+
+.gallery-directions {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #fff;
+  z-index: 50;
+  position: fixed;
+  padding: 40px;
+  font-size: 2em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  top: 50%;
+  left: 90%;
+}
+
+.gallery img, .gallery-desc {
+  width: 100vw;
+  position: fixed;
+  top: 10;
+  left: 0;
+  height: 60vh;
+}
+
